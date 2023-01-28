@@ -58,52 +58,32 @@
   */
 
   const chains = [{
-    chainId: 'f16b1833c747c43682f4386fca9cbb327929334a762755ebec17f6f23c9b8a12',
-    nodeUrl: 'https://test.wax.eosusa.io',
-    name: "waxtestnet",
-    label: "WAX Testnet",
-    txExplorer: "https://wax-test.bloks.io/transaction",
-    proofSocket: "wss://wax-testnet-ibc.goldenplatform.com",
-    bridgeContract:"antelopeibc2",
-    wrapLockContractsArray: ["antelopewlk1", "antelopewlk2", "antelopewlk3", "antelopewlk4"],
+    chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+    nodeUrl: 'https://eos.api.eosnation.io',
+    name: "eos",
+    label: "EOS",
+    txExplorer: "https://eos.eosq.eosnation.io/tx",
+    proofSocket:  "wss://ibc-server.uxnetwork.io/eos",
+    bridgeContract:"ibc.prove",
+    wrapLockContractsArray: ["ibc.wl.ux", "ibc.wl.tlos"],
   },{
-    chainId: '1eaa0824707c8c16bd25145493bf062aecddfeb56c736f6ba6397f3195f33c9f',
-    nodeUrl: 'https://test.telos.eosusa.io',
-    txExplorer: "https://explorer-test.telos.net/transaction",
-    name: "telostestnet",
-    label: "Telos Testnet",
-    proofSocket: "wss://telos-testnet-ibc.goldenplatform.com",
-    bridgeContract:"antelopeibc2",
-    wrapLockContractsArray: ["antelopewlk1", "antelopewlk2", "antelopewlk3", "antelopewlk4"],
+    chainId: '8fc6dce7942189f842170de953932b1f66693ad3788f766e777b6f9d22335c02',
+    nodeUrl: 'https://api.uxnetwork.io', 
+    txExplorer: 'https://explorer.uxnetwork.io/tx',
+    name: "ux",
+    label: "UX",
+    proofSocket: "wss://ibc-server.uxnetwork.io/ux",
+    bridgeContract:"ibc.prove",
+    wrapLockContractsArray: ["ibc.wl.eos", "ibc.wl.tlos"],
   },{
-    chainId: '5002d6813ffe275d9471a7e3a301eab91c36e8017f9664b8431fbf0e812a0b04',
-    nodeUrl: 'https://test.ux.eosusa.io',
-    txExplorer: 'https://testnet.uxnetwork.io/tx',
-    name: "uxpubtestnet",
-    label: "UX Public Testnet",
-    proofSocket: "wss://testnet-ibc.uxnetwork.io",
-    bridgeContract:"antelopeibc2",
-    wrapLockContractsArray: ["antelopewlk1", "antelopewlk2", "antelopewlk3", "antelopewlk4"]
-  },{
-    chainId: '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d',
-    nodeUrl: 'https://jungle4.api.eosnation.io', //api supporting send_transaction2
-    txExplorer: 'https://jungle4.eosq.eosnation.io/tx',
-    name: "jungle4",
-    label: "Jungle 4 Testnet",
-    proofSocket: "wss://jungle4-ibc.goldenplatform.com",
-    bridgeContract:"antelopeibc2",
-    wrapLockContractsArray: ["antelopewlk1", "antelopewlk2", "antelopewlk3", "antelopewlk4"],
-    version:3.1 //Can fetch from get_info
-  },{
-    chainId: '5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191',
-    nodeUrl: 'https://kylin.api.eosnation.io', //api supporting send_transaction2
-    txExplorer: 'https://kylin.eosq.eosnation.io/tx',
-    name: "kylin",
-    label: "Kylin Testnet",
-    proofSocket: "wss://kylin-ibc.goldenplatform.com",
-    bridgeContract:"antelopeibc2",
-    wrapLockContractsArray: ["antelopewlk1", "antelopewlk2", "antelopewlk3", "antelopewlk4"],
-    version:3.1 //Can fetch from get_info
+    chainId: '4667b205c6838ef70ff7988f6e8257e8be0e1284a2f59699054a018f743b1d11',
+    nodeUrl: 'https://telos.api.eosnation.io', 
+    txExplorer: 'https://explorer.telos.net/transaction',
+    name: "tlos",
+    label: "TELOS",
+    proofSocket: "wss://ibc-server.uxnetwork.io/telos",
+    bridgeContract:"ibc.prove",
+    wrapLockContractsArray: ["ibc.wl.ux", "ibc.wl.eos"],
   }];
 
   for (var chain of chains){
@@ -133,7 +113,7 @@
     fetchProgress+=50;
     $('.progressDiv').last().html(fetchProgress+"%");
     let groupedResults = [];
-    while(initialResults.length > 2) groupedResults.push(initialResults.splice(0, 2));
+    while(initialResults.length) groupedResults.push(initialResults.splice(0, 2));
     let tokenPromises = []
     for (var result of groupedResults){
       const global = result[0][0];
