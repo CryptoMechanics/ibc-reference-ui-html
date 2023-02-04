@@ -93,7 +93,7 @@
     chain.wrapLockContracts = [];
   }
 
-  let sourceChain, destinationChain, tokenRow, fetchProgress=0,progressInterval;
+  let sourceChain, destinationChain, tokenRow, fetchProgress=0,progressInterval, destinationActions;
   fetchTokens();
 
   async function fetchTokens(){
@@ -263,6 +263,7 @@
 
   //transfer function to lock or retire tokens
   const transfer = async () => {
+    destinationActions = null;
     //get values form UI
     tokenRow = sourceChain.symbols.find(r=>r.id===parseInt($('#sourceAsset').val()));
     let amount = parseFloat($("#amount").val());
@@ -340,35 +341,33 @@
       console.log("emitxferProof",emitxferProof)
 
       //submit proof to destination chain's bridge contract
-      let destinationActions = [...scheduleProofs, emitxferProof];
+      destinationActions = [...scheduleProofs, emitxferProof];
+      submitProof();
+    });
+  }
+
+  const submitProof = async () =>{
+    $('#status').append(`<div><div>Submitting proof(s)<span class="proofTx" style="margin-left:12px"></span></div> <div class="progressDiv">0%</div></div>`);
+    $('#resetBtn').hide();
+    try{
       console.log("destinationActions",destinationActions)
-      $('#status').append(`<div><div>Submitting proof(s)<span id="proofTx" style="margin-left:12px"></span></div> <div class="progressDiv">0%</div></div>`);
       const signedDestinationTx = await destinationChain.session.transact({actions: destinationActions}, {broadcast:false, expireSeconds:360, blocksBehind:3});
       $('.progressDiv').last().html("50%");
-
-      if (!signedDestinationTx || !signedDestinationTx.signatures) return $('#status').append(`<div>Error signing TX</div>`);
-
+      
       submitTx(signedDestinationTx, destinationChain, 6 ).then( async result => {
         $('.progressDiv').last().html("100%");
         console.log("result", result);
-        $('#proofTx').html(`<a target="_blank" style="color:#1a8754" href="${destinationChain.txExplorer}/${result.processed.id}">Proof TX<a>`)
+        $('.proofTx').last().html(`<a target="_blank" style="color:#1a8754" href="${destinationChain.txExplorer}/${result.processed.id}">Proof TX<a>`)
         $('#resetBtn').show();
-      }).catch(async err=>{
-        $('.progressDiv').last().html("Error");
-        console.log("Error pushing proof", err);
-        if(progressInterval) clearInterval(progressInterval);
-        $('#status').append(`<br><div>Error submitting proof(s): </div>`);
-        $('#status').append(`${err.responseJSON.error.details[0].message}</div>`);
-        $('#resetBtn').show();
-      })
-    })
-    .catch(err2=>{
-      console.log("Error submitting TX", err2); 
+      });
+
+    }catch(ex){ //catch signing errors
+      $('.progressDiv').last().html("Error");
+      console.log("Error signing transaction");
       if(progressInterval) clearInterval(progressInterval);
-      $('#status').append(`<br><div>Error submitting TX: </div>`);
-      $('#status').append(`${err2.responseJSON.error.details[0].message}</div>`);
+      $('#status').append(`<br><div><div>Error signing TX</div><div> <button class="btn btn-warning btn-sm" style="width:54px;--bs-btn-padding-y: 0.125rem;" onclick="submitProof()">Retry</button></div></div>`);
       $('#resetBtn').show();
-    })
+    }
   }
 
   const getScheduleProofs = async (transferBlock) => {
@@ -553,9 +552,10 @@
     }catch(ex){
       if(progressInterval) clearInterval(progressInterval);
       $('#resetBtn').show();
-      $('.progressDiv').last().html("0%");
+      $('.progressDiv').last().html("Error");
       console.log("Exception submitting tx", ex);
-      $('#status').append(`<br><div>Error submitting TX: </div>`);
+      if (destinationActions) $('#status').append(`<br><div><div>Error submitting proof(s):</div><div> <button class="btn btn-warning btn-sm" style="width:54px;--bs-btn-padding-y: 0.125rem;" onclick="submitProof()">Retry</button></div></div>`);
+      else $('#status').append(`<br><div>Error submitting TX: </div>`);
       $('#status').append(`<div>${ex.responseJSON.error.details[0].message}</div>`);
       if (ex.responseJSON.error.details[1]) $('#status').append(`<div>${ex.responseJSON.error.details[1].message}</div>`)
       return 
