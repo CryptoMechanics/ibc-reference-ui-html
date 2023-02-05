@@ -356,6 +356,8 @@
       
       submitTx(signedDestinationTx, destinationChain, 6 ).then( async result => {
         $('.progressDiv').last().html("100%");
+        $('.btn-warning').prop('disabled', true);
+
         console.log("result", result);
         $('.proofTx').last().html(`<a target="_blank" style="color:#1a8754" href="${destinationChain.txExplorer}/${result.processed.id}">Proof TX<a>`)
         $('#resetBtn').show();
@@ -365,6 +367,8 @@
       $('.progressDiv').last().html("Error");
       console.log("Error signing transaction");
       if(progressInterval) clearInterval(progressInterval);
+      $('.btn-warning').last().addClass('is-disabled');
+      $('.btn-warning').last().prop('disabled', true);
       $('#status').append(`<br><div><div>Error signing TX</div><div> <button class="btn btn-warning btn-sm" style="width:54px;--bs-btn-padding-y: 0.125rem;" onclick="submitProof()">Retry</button></div></div>`);
       $('#resetBtn').show();
     }
@@ -554,6 +558,9 @@
       $('#resetBtn').show();
       $('.progressDiv').last().html("Error");
       console.log("Exception submitting tx", ex);
+
+      $('.btn-warning').last().addClass('is-disabled');
+      $('.btn-warning').last().prop('disabled', true);
       if (destinationActions) $('#status').append(`<br><div><div>Error submitting proof(s):</div><div> <button class="btn btn-warning btn-sm" style="width:54px;--bs-btn-padding-y: 0.125rem;" onclick="submitProof()">Retry</button></div></div>`);
       else $('#status').append(`<br><div>Error submitting TX: </div>`);
       $('#status').append(`<div>${ex.responseJSON.error.details[0].message}</div>`);
