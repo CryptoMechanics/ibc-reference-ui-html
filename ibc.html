@@ -7,16 +7,20 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/anchor-link@3.5.1/lib/anchor-link.bundle.js"></script>
   <script src="https://unpkg.com/anchor-link-browser-transport@3.5.1/lib/anchor-link-browser-transport.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 </head>
 
 <body style="max-width:640px;margin:40px auto;">
   <div class="container" style="border:1px solid #64646d;padding:24px;">
     <h3 class="text-center">IBC DEMO</h3>
     <div class="flexRow"  style="margin-top:24px;">
+      <div class="editButtons" onclick="showEndpoints('source')" style=""><a href="#modal" rel="modal:open">Edit</a></div>
       <select onchange="chainChanged()" class="form-select chainSelect" id="sourceChain">
         <option value="" disabled selected>Select Source Chain</option>
       </select>
+      <div class="editButtons" onclick="showEndpoints('destination')" style="margin-left:566px;"><a href="#modal" rel="modal:open">Edit</a></div>
       <select  onchange="chainChanged()" class="form-select chainSelect" id="destinationChain">
         <option value="" disabled selected>Select Destination Chain</option>
       </select>
@@ -44,6 +48,10 @@
     </section></div>
     <div style="text-align:center;margin-top:24px;"><button id="resetBtn" onclick="reset()" style="display:none;" type="button" class="btn btn-primary">New Transfer</button></div>
   </div>
+
+  <div id="modal" class="modal">
+    <a href="#" rel="modal:close">Close</a>
+  </div>
 </body>
 
 <script>
@@ -59,7 +67,7 @@
 
   const chains = [{
     chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-    nodeUrl: 'https://eos.api.eosnation.io',
+    nodeUrl: 'https://eos.eosusa.io',
     name: "eos",
     label: "EOS",
     txExplorer: "https://eos.eosq.eosnation.io/tx",
@@ -205,6 +213,8 @@
     for (var r of sourceChain.symbols.filter(r=>!r.native)) optionsHtml+=`<option value=${r.id}>${r.symbol}</option>`;
     optionsHtml+=`</optgroup>`;
     $('#sourceAsset').append(optionsHtml);
+
+    $('.editButtons').show();
   }
 
   //UI functions
@@ -258,6 +268,27 @@
     $(`#amount`).prop('disabled', false);
     // logout('destination');
     // logout('source');
+  }
+
+  const showEndpoints = type => {
+    let chain = type=='source' ? sourceChain : destinationChain;
+    let html = `
+      <div>
+        <div style="text-align:center;font-size:24px;margin:8px 0">${chain.label}</div>
+        <div>API Endpoint: <input id="nodeUrl" style="width:100%;margin-top:4px;" class="form-control" type="text" value="${chain.nodeUrl}"></div> 
+        <div style="margin-top:20px;">Proof Socket: <input id="proofSocket" style="width:100%;margin-top:4px;" class="form-control" type="text" value="${chain.proofSocket}"></div> 
+      </div>
+      <div style="display:flex;margin-top:24px;">
+        <a href="#" rel="modal:close" style="width:210px;"> <button style="width:210px;" type="button" class="btn btn-danger">Cancel</button></a>
+        <a href="#" rel="modal:close" style="width:210px;"> <button style="width:210px;margin-left:20px;" onclick="save('${type}')" type="button" class="btn btn-success">Save</button></a>
+      </div>
+    `
+    $('#modal').html(html);
+  }
+  const save = type => {
+    let chain = type=='source' ? sourceChain : destinationChain;
+    chain.nodeUrl = $('#nodeUrl').val();
+    chain.proofSocket = $('#proofSocket').val();
   }
 
 
@@ -682,5 +713,9 @@
   .form-select:disabled { background-color: #adafb2; }
   .box{ padding:16px; border:1px solid #64646d;margin-top:44px; }
   .box > div, #status > div{ display:flex; justify-content: space-between; }
+  .modal {background:#31313d;height:300px; vertical-align: unset;}
+  .modal a.close-modal{top:3px;right:3px;}
+  .editButtons{position:absolute;top:106px;font-size:12px;display:none;margin-left:246px;}
+  .editButtons a{color:white; text-decoration:none;}
 </style>
 </html>
